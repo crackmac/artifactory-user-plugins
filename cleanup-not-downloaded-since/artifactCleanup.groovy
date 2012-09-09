@@ -7,7 +7,7 @@ executions {
 }
 
 jobs {
-    scheduledCleanup(cron: "0 0 5 ? * 1") {
+    scheduledCleanup(cron: "0 59 23 ? * *") {
         def config = new ConfigSlurper().parse(new File("${System.properties.'artifactory.home'}/etc/plugins/artifactCleanup.properties").toURL())
         artifactCleanup(config.monthsUntil, config.repos as String[], log);
     }
@@ -25,7 +25,7 @@ private def artifactCleanup(months, repos, log) {
         xml == null || Long.valueOf(new XmlSlurper().parseText(xml).lastDownloaded.text()) < toInMillis
     }.each {
         log.info "Deleting $it"
-        repositories.undeploy it
+        repositories.delete it
     }
     log.info "Finished cleanup, deleted $artifactsCleanedUp.size artifacts"
 }
